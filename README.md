@@ -1,4 +1,4 @@
-CPU Scheduler
+# CPU Scheduler
 **Author** : Siddhant Rohila
 ## Project Description
 
