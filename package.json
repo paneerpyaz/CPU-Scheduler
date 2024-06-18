@@ -1,0 +1,13 @@
+{
+  "name": "cpu-scheduler",
+  "version": "1.0.0",
+  "description": "CPU Scheduler with Electron and C++ backend",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^21.0.0"
+  },
+  "devDependencies": {}
+}

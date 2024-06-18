@@ -1,0 +1,147 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CPU Scheduler v1.0</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body class="bg-dark text-white container mt-5">
+    <div class="d-flex justify-content-center">
+        <div class="card bg-secondary text-white" style="width: 60%;">
+            <div class="card-body">
+                <h1 class="card-title">CPU Scheduler</h1>
+                <div class="form-group">
+                    <label for="algorithmSelect">Choose Algorithm :</label>
+                    <select class="form-control bg-dark text-white" id="algorithmSelect">
+                        <option value="SJF">Shortest Job First</option>
+                            <option value="LJF">Longest Job First</option>
+                            <option value="FCFS">First Come First Serve</option>
+                            <option value="LRTF">Longest Remaining Time First</option>
+                            <option value="HRRN">Highest Response Ratio Next</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="processInput">Enter Process Details:</label>
+                    <textarea class="form-control bg-dark text-white" id="processInput" placeholder="Enter process details" rows="3"></textarea>
+                </div>
+                <button class="btn btn-primary" id="runSchedulerBtn">Run Scheduler</button>
+                <pre id="result" class="mt-3 bg-dark text-white p-3 rounded"></pre>
+            </div>
+        </div>
+        <div class="card bg-secondary text-white ml-3" id="averageBox" style="width: 30%; display: none;">
+            <div class="card-body">
+                <h1 class="card-title">Average Values</h1>
+                <p id="averageTAT"></p>
+                <p id="averageWT"></p>
+                <p id="cpuOverhead"></p> 
+            </div>
+            
+        </div>
+        
+    </div>
+    <div id="gantt-chart"></div>
+    <script src="script_ipc.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CPU Scheduler v1.0</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body class="container mt-5">
+    <div class="d-flex justify-content-center">
+        <div class="card" style="width: 60%;">
+            <div class="card-body">
+                <h1 class="card-title">CPU Scheduler</h1>
+                <div class="form-group">
+                    <label for="algorithmSelect">Choose Algorithm :</label>
+                    <select class="form-control" id="algorithmSelect">
+                        <option value="SJF">Shortest Job First</option>
+                        <option value="LJF">Longest Job First</option>
+                        <option value="FCFS">First Come First Serve</option>
+                        <option value="LRTF">Longest Remaining Time First</option>
+                        <option value="HRRN">Highest Response Ratio Next</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="processInput">Enter Process Details:</label>
+                    <textarea class="form-control" id="processInput" placeholder="Enter process details" rows="3"></textarea>
+                </div>
+                <button class="btn btn-primary" id="runSchedulerBtn">Go!</button>
+                <pre id="result" class="mt-3 p-3 rounded"></pre>
+            </div>
+        </div>
+        <div class="card ml-3" id="averageBox" style="width: 30%; display: none;">
+            <div class="card-body">
+                <h1 class="card-title">Average Values</h1>
+                <p id="averageTAT"></p>
+                <p id="averageWT"></p>
+                <p id="cpuOverhead"></p> 
+            </div>
+        </div>
+    </div>
+    <div id="gantt-chart"></div>
+    <script src="script_ipc.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CPU Scheduler App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body class="container mt-5">
+    <div class="d-flex justify-content-center">
+        <div class="card bg-secondary text-white" style="width: 60%;">
+            <div class="card-body">
+                <h1 class="card-title">CPU Scheduler App</h1>
+                <div class="form-group">
+                    <label for="algorithmSelect">Select Algorithm:</label>
+                    <select class="form-control bg-dark text-white" id="algorithmSelect">
+                        <option value="SJF">Shortest Job First</option>
+                        <option value="LJF">Longest Job First</option>
+                        <option value="FCFS">First Come First Serve</option>
+                        <option value="LRTF">Longest Remaining Time First</option>
+                        <option value="HRRN">Highest Response Ratio Next</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="processInput">Enter Process Details:</label>
+                    <textarea class="form-control bg-dark text-white" id="processInput" placeholder="Enter process details" rows="3"></textarea>
+                </div>
+                <button class="btn btn-primary" id="runSchedulerBtn">Run Scheduler</button>
+                <pre id="result" class="mt-3 bg-dark text-white p-3 rounded"></pre>
+            </div>
+        </div>
+        <div class="card bg-secondary text-white ml-3" id="averageBox" style="width: 30%; display: none;">
+            <div class="card-body">
+                <h1 class="card-title">Averages</h1>
+                <p id="averageTAT"></p>
+                <p id="averageWT"></p>
+                <p id="cpuOverhead"></p>
+            </div>
+        </div>
+    </div>
+    <div id="gantt-chart"></div>
+    <script src="renderer.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> -->
