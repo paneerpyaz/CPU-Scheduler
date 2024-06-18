@@ -1,7 +1,6 @@
 #include "HRRN.h"
 #include<algorithm>
 
-// HRRN function definition
 void HRRN(std::vector<Process>& processes) {
     int n = processes.size();
     int currentTime = 0;
