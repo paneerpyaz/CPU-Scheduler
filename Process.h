@@ -12,4 +12,4 @@ struct Process {
     int startTime = 0;
 };
 
-#endif // PROCESS_H
+#endif
