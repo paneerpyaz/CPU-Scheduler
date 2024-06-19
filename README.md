@@ -425,6 +425,7 @@ ipcMain.on('runScheduler', (event, { algorithm, input }) => {
 - Scheduling algorithms by [Neso Academy](https://www.youtube.com/playlist?list=PLBlnK6fEyqRitWSE_AyyySWfhRgyA-rHk)
 - Geeks For Geeks for learning [implementations](https://www.geeksforgeeks.org/program-for-fcfs-cpu-scheduling-set-1/)
 - Understanding Simulation from [here](https://ravipatel1309.github.io/CPUScheduler/docs.html)
+- Electron.js [documentation](https://www.electronjs.org/blog/electron-doumentation)
 
 
 
