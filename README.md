@@ -38,7 +38,7 @@ The combination of an intuitive Electron-based interface and a high-performance 
 - The first look of the application will be like this :
   <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="images/basic.png" alt="Flowchart" style="width: 80%;">
-    <p style="text-align: center;"><em>Figure 1: Application's inital look</em></p>
+    <p style="text-align: center;"><em>Figure 1: Application's initial look</em></p>
   </div>
 
 - It consists of a selection bar where we can select one of the 5 CPU Scheduling algorithms I've implemented. You can write the process details in a format I'll explain later.
