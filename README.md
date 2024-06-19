@@ -54,12 +54,12 @@ The combination of an intuitive Electron-based interface and a high-performance 
 - After we press the "Go!" button, the output is as shown
     <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="images/output.png" alt="Flowchart" style="width: 70%;">
-    <p style="text-align: center;"><em>Figure 4: Output</em></p>
+    <p style="text-align: center;"><em>Figure 4(a): Output</em></p>
   </div>
 - The Gantt Chart display on output
   <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="images/gantt.png" alt="Flowchart" style="width: 70%;">
-    <p style="text-align: center;"><em>Figure 4: Output</em></p>
+    <p style="text-align: center;"><em>Figure 4(b): Output Gantt Chart</em></p>
   </div>
 
 
@@ -307,6 +307,124 @@ This ratio ensures that processes with longer waiting times are given higher pri
 
 - The algorithm begins by sorting the processes based on their arrival times. It then iterates through the list of processes, calculating the response ratio for each process that has arrived and is not yet completed. The process with the highest response ratio is selected for execution. If no process is ready to execute, the current time is incremented. Once a process is selected, its start time, completion time, turnaround time, and waiting time are calculated. The algorithm continues until all processes are completed.
 - Hence, this HRRN implementation starts by sorting the processes by arrival time. It then calculates the response ratio for each process that has arrived and is not yet completed, selecting the process with the highest ratio for execution. The selected process's start time, completion time, turnaround time, and waiting time are updated, and the algorithm continues until all processes are completed. This approach ensures that processes with longer waiting times are given higher priority, providing a balanced scheduling strategy that benefits both short and long processes.
+
+### Some JavaScripts Explanations :
+1. **script_ipc.js**
+```
+const { ipcRenderer } = require('electron');
+
+const runSchedulerBtn = document.getElementById('runSchedulerBtn');
+const resultElement = document.getElementById('result');
+const averageBox = document.getElementById('averageBox');
+const averageTATElement = document.getElementById('averageTAT');
+const averageWTElement = document.getElementById('averageWT');
+const cpuOverheadElement = document.getElementById('cpuOverhead'); 
+
+runSchedulerBtn.addEventListener('click', () => {
+    const algorithm = document.getElementById('algorithmSelect').value;
+    const input = document.getElementById('processInput').value;
+
+    console.log('Sending runScheduler event with algorithm:', algorithm);
+    console.log('Input:', input);
+
+    ipcRenderer.send('runScheduler', { algorithm, input });
+});
+
+ipcRenderer.on('schedulerResult', (event, { error, result }) => {
+    if (error) {
+        console.log(`Scheduler error: ${error}`);
+        resultElement.innerText = `Error: ${error}`;
+        resultElement.classList.add('text-danger');
+        resultElement.classList.remove('text-success');
+    } else {
+        console.log('Scheduler result:', result);
+        const { processes, averageTAT, averageWT, schedulingOverhead } = result;
+        resultElement.innerText = `Processes: ${JSON.stringify(processes, null, 2)}`;
+        
+        averageTATElement.innerText = `Average Turnaround Time: ${averageTAT}`;
+        averageWTElement.innerText = `Average Waiting Time: ${averageWT}`;
+        cpuOverheadElement.innerText = `Scheduling Overhead: ${schedulingOverhead.toFixed(12)} s`;
+
+        averageBox.style.display = 'block';
+        renderGanttChart(processes);
+        resultElement.classList.add('text-success');
+        resultElement.classList.remove('text-danger');
+    }
+});
+```
+- This JavaScript code, designed to be used within an Electron-based CPU scheduling project, facilitates the interaction between the user interface and the backend logic for running different scheduling algorithms. It uses Electron's IPC (Inter-Process Communication) capabilities to send and receive messages between the renderer process (the front-end) and the main process (the back-end). This separation of concerns helps maintain a clean architecture where the front-end handles user interactions and displays results, while the back-end performs the computational tasks.
+- The code begins by importing the ipcRenderer module from Electron, which allows the renderer process to communicate with the main process. It then selects various HTML elements from the document, such as buttons and divs, which will be used to display results and capture user inputs. The runSchedulerBtn element is particularly important as it triggers the scheduling process when clicked. This button is linked to an event listener that captures the selected scheduling algorithm and the process data inputted by the user. These details are then sent to the main process via the ipcRenderer.send method, effectively requesting the scheduling computation.
+- Upon receiving the results from the main process through the ipcRenderer.on event listener, the code handles both success and error scenarios. If an error occurs during the scheduling computation, the error message is displayed to the user with appropriate styling to indicate a problem. Conversely, if the scheduling is successful, the resulting process details, average turnaround time (TAT), average waiting time (WT), and scheduling overhead are displayed. The scheduling overhead is formatted to a precise float value, indicating the time taken by the scheduler in seconds, and is shown in the cpuOverheadElement.
+- In addition to displaying textual results, the code also includes functionality for rendering a Gantt chart to visually represent the scheduling of processes. This visualization is achieved through a separate function, renderGanttChart, which utilizes D3.js to create an SVG-based chart. The function sets up the necessary scales and axes, and maps the process data to draw colored bars representing each process's execution period. This visual aid helps users better understand the scheduling order and duration of processes, enhancing the overall comprehensibility of the scheduling algorithms.
+- Overall, this code integrates the front-end UI with the back-end scheduling logic in a CPU scheduling project, providing a comprehensive user experience. By leveraging Electron for desktop application capabilities, IPC for efficient communication, and D3.js for dynamic visualizations, the project ensures that users can easily input data, run different scheduling algorithms, and view both textual and visual results. This approach not only makes the tool interactive and user-friendly but also educational by allowing users to see the immediate impact of different scheduling strategies on process execution.
+
+2. **main.js**
+```
+const { app, BrowserWindow, ipcMain } = require('electron');
+const { spawn } = require('child_process');
+const path = require('path');
+let mainWindow;
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        width: 1200,
+        height: 900,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+    mainWindow.loadFile('index.html');
+}
+app.on('ready', createWindow);
+
+ipcMain.on('runScheduler', (event, { algorithm, input }) => {
+    console.log('Received runScheduler event with algorithm:', algorithm);
+    console.log('Input:', input)
+    const exe = spawn('./scheduler.exe', [algorithm, input]);
+    exe.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+        try {
+            let result = JSON.parse(data);
+            console.log("Output received:");
+            console.log(result);
+            event.sender.send('schedulerResult', { result });
+        } catch (error) {
+            console.error('Error parsing JSON:', error.message);
+            event.sender.send('schedulerResult', { error: 'Error parsing JSON' });
+        }
+    });
+    exe.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+        event.sender.send('schedulerResult', { error: data.toString() });
+    });
+    exe.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+        if (code !== 0) {
+            console.error(`Process exited with code ${code}`);
+            event.sender.send('schedulerResult', { error: `Process exited with code ${code}` });
+        }
+    });
+    exe.on('error', (err) => {
+        console.error('Failed to start child process:', err);
+        event.sender.send('schedulerResult', { error: err.message });
+    });
+});
+```
+- This Electron-based code snippet sets up the main process and handles communication between the front-end and a scheduling algorithm executed as a separate process. It utilizes Electron's app, BrowserWindow, and ipcMain modules to create a desktop application window and manage inter-process communication. Additionally, it employs Node.js modules like child_process for spawning a separate process to run the scheduling algorithm and path for handling file paths.
+- Upon launching the Electron application (app.on('ready', createWindow)), a new browser window (BrowserWindow) is created with specified dimensions and web preferences. The createWindow function loads an HTML file (index.html) into this window, providing the user interface where scheduling algorithms can be selected and executed.
+- The core functionality revolves around the ipcMain.on('runScheduler', ...) event handler. This listens for events from the renderer process (ipcRenderer.send('runScheduler', ...)) requesting to execute a scheduling algorithm. It receives parameters such as the algorithm type (algorithm) and input data (input). Upon receiving this request, it spawns a child process (exe) using spawn('./scheduler.exe', [algorithm, input]).
+- The spawned process (exe) represents an external executable (scheduler.exe) that performs the actual computation of the selected scheduling algorithm. Communication between the Electron application and this external process occurs via standard input and output streams (stdin, stdout, stderr). The exe.stdout.on('data', ...) event handler listens for data output from the process. If the output data can be parsed as JSON, indicating successful computation, it sends the results back to the renderer process (event.sender.send('schedulerResult', { result })). In case of errors during execution, it catches errors and sends appropriate error messages to the renderer process (event.sender.send('schedulerResult', { error })).
+- Overall, this architecture ensures that the Electron application provides a seamless user experience for interacting with CPU scheduling algorithms, leveraging both Node.js capabilities and the Electron framework's multi-process architecture to efficiently manage complex computational tasks and deliver informative results to the user interface.
+
+## Learning takeaways
+- Working on my CPU scheduling project was a fascinating dive into operating system fundamentals. I enjoyed studying various CPU scheduling algorithms through ACM resources, each offering unique insights into managing computer resources efficiently. It was a challenge to use Electron JS, a new framework for me, to build the project. Despite the learning curve, it was rewarding to apply core computer science concepts in this new environment.
+- Optimizing algorithm logic in C++ was another highlight of the project. It was a great exercise in applying logical skills to improve efficiency and performance. Learning about IPC renderers and how to plot Gantt charts was essential. It helped me understand how different parts of the system interact and visualize scheduling processes effectively.
+- Overall, this project taught me a lot about OS concepts, software development, and practical problem-solving. It was a valuable experience that deepened my understanding of computer systems and enhanced my skills in software engineering.
+
+## Resources
+- Scheduling algorithms by [Neso Academy](https://www.youtube.com/playlist?list=PLBlnK6fEyqRitWSE_AyyySWfhRgyA-rHk)
+- Geeks For Geeks for learning [implementations](https://www.geeksforgeeks.org/program-for-fcfs-cpu-scheduling-set-1/)
+- Understanding Simulation from [here](https://ravipatel1309.github.io/CPUScheduler/docs.html)
 
 
 
